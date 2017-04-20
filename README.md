@@ -1,2 +1,1 @@
-# MotionDetection
-Human Motion and Pose Detection.
+# Face Pose Estimation
