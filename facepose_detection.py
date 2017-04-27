@@ -1,7 +1,7 @@
 #!/home/hackpython/anaconda3/bin/python
 
 # Author: Abhishek Sharma
-# Code: Face Pose Estimation using DLib Library
+# Program: Face Pose Estimation using Haar Cascasde, HOG and Dlib Library.
 
 import os
 import cv2
@@ -14,11 +14,8 @@ from imutils import face_utils
 class PoseDetection:
 
     def __init__(self,option_type,path):
-        # Haar Cascade
+
         self.face_cascade = cv2.CascadeClassifier("cascade/haarcascade_frontalface_default.xml")
-        #self.fullbody_cascade = cv2.CascadeClassifier("cascade/haarcascade_fullbody.xml")
-        #self.upperbody_cascade = cv2.CascadeClassifier("cascade/haarcascade_upperbody.xml")
-        #self.lowerbody_cascade = cv2.CascadeClassifier("cascade/haarcascade_lowerbody.xml")
         self.eye_cascade = cv2.CascadeClassifier("cascade/haarcascade_eye.xml")
         self.smile_cascade = cv2.CascadeClassifier("cascade/haarcascade_smile.xml")
         self.shape_predictor = "cascade/shape_predictor_68_face_landmarks.dat"
@@ -29,7 +26,6 @@ class PoseDetection:
         self.video_path = None
         self.webcam_path = None
         self.main_function()
-
 
     def haar_facedetection(self,img):
         faces = self.face_cascade.detectMultiScale(img,1.3,5)
@@ -48,7 +44,6 @@ class PoseDetection:
         
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor(self.shape_predictor)
-        #image = cv2.imread(image)
         image = imutils.resize(image, width=500)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         rects = detector(image, 1)
@@ -61,45 +56,6 @@ class PoseDetection:
                 cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
         return image
 
-    def SolvePnP(self):
-
-        im = cv2.imread(self.image_path);
-        size = im.shape
-        image_points = np.array([
-                                    (359, 391),     
-                                    (399, 561),     
-                                    (337, 297),
-                                    (513, 301),     
-                                    (345, 465),     
-                                    (453, 469)      
-                                ], dtype="double")
-        model_points = np.array([
-                                    (0.0, 0.0, 0.0),            
-                                    (0.0, -330.0, -65.0),   
-                                    (-225.0, 170.0, -135.0),
-                                    (225.0, 170.0, -135.0),      
-                                    (-150.0, -150.0, -125.0),
-                                    (150.0, -150.0, -125.0)
-                                ])
-        focal_length = size[1]
-        center = (size[1]/2, size[0]/2)
-        camera_matrix = np.array(
-                                [[focal_length, 0, center[0]],
-                                [0, focal_length, center[1]],
-                                [0, 0, 1]], dtype = "double"
-                                )
-
-        dist_coeffs = np.zeros((4,1))
-        (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix, dist_coeffs)
-        (nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, camera_matrix, dist_coeffs)
-        for p in image_points:
-            cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
-        p1 = ( int(image_points[0][0]), int(image_points[0][1]))
-        p2 = ( int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
-        cv2.line(im, p1, p2, (255,0,0), 2)
-        # Display image
-        cv2.imshow("Output", im);
-        cv2.waitKey(0);
 
     def webcam(self):
         cap = cv2.VideoCapture(int(self.webcam_path))
@@ -175,7 +131,6 @@ class PoseDetection:
         for (x,y,w,h) in fullbody:
             cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
 
-        #img = self.dlib_function(img)
         faces = self.haar_facedetection(gray)
         for (x,y,w,h) in faces:
             cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
